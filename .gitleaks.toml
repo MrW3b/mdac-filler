@@ -1,0 +1,9 @@
+# gitleaks picks this up automatically from the repo root.
+# Default rules plus one for this repo: a passport-number-looking value next to a passport field name.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "mdac-passport-value"
+description = "Passport number assigned next to a passport field name"
+regex = '''(?i:passportNo|passNo|passport)["'\s:=]{1,4}["']?[A-Z0-9]{8,12}\b'''

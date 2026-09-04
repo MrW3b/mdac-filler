@@ -1,0 +1,56 @@
+# MDAC registration form controls, live DOM, fetched 2026-09-04 (HTML comments removed, option lists removed)
+
+<input type="hidden" name="hdCurrLang" id="hdCurrLang" value="ms" />
+<button type="button" data-target=".navbar-main-collapse" data-toggle="collapse" class="navbar-toggle">
+<form method="post" name="permohonan" action="/mdac/register;jsessionid=SCRUBBED" onsubmit="return validateSubmit();">
+<input name="mdacVisaCountry" id="mdacVisaCountry" type="hidden" value="" />
+<input name="sNation" id="sNation" type="hidden" value="" />
+<input name="sRegion" id="sRegion" type="hidden" value="" />
+<input name="sState" id="sState" type="hidden" value="" />
+<input name="sCity" id="sCity" type="hidden" value="" />
+<input name="sStay" id="sStay" type="hidden" value="" />
+<input name="sMode" id="sMode" type="hidden" value="" />
+<input name="sEmbark" id="sEmbark" type="hidden" value="" />
+<input type="hidden" name="hdCurrLang" id="hdCurrLang" value="ms" />
+<input onpaste="return false;" maxlength="60" name="name" style="width:90%" id="name" type="text" class="form-control uppercase name" onkeypress="return isCharacterKey(event);" />
+<input onpaste="return false;" maxlength="12" name="passNo" style="width:250px" id="passNo" type="text" class="form-control uppercase passNo" onkeypress="return isNumberCharacterKey(event);" />
+<input readonly="readonly" name="dob" style="width:230px; cursor:pointer; background-color: #FFFFFF" id="dob" placeholder="DD/MM/YYYY" type="text" class="form-control" />
+<select name="nationality" onchange="showAccommodation(this.value); retrieveCountryPhone(this.value);" style="width:230px" id="nationality" class="form-control uppercase nationality">
+<select name="pob" onchange="showAccommodation(this.value); retrieveCountryPhone(this.value);" style="width:230px" id="pob" class="form-control uppercase pob">
+<select name="sex" style="width:230px" id="sex" class="form-control uppercase sex">
+<input readonly="readonly" name="passExpDte" style="width:230px; cursor:pointer; background-color: #FFFFFF" id="passExpDte" placeholder="DD/MM/YYYY" type="text" class="form-control passExpDte" />
+<input onblur="return checkEmail();" onpaste="return false" maxlength="100" name="email" style="width:80%" id="email" type="text" class="form-control email" />
+<input onblur="return validateEmail();" oncopy="return false" onpaste="return false" maxlength="100" name="confirmEmail" style="width:80%" id="confirmEmail" type="text" class="form-control confirmEmail" />
+<select name="region" style="width:380px" id="region" class="form-control uppercase region">
+<input onpaste="return false;" maxlength="12" name="mobile" style="width:250px" id="mobile" type="text" class="form-control uppercase mobile" onkeypress="return isNumberSpecialKey(event);" />
+<input readonly="readonly" name="arrDt" style="width:230px; cursor:pointer; background-color: #FFFFFF" id="arrDt" placeholder="DD/MM/YYYY" type="text" class="form-control" />
+<input readonly="readonly" name="depDt" style="width:230px; cursor:pointer; background-color: #FFFFFF" id="depDt" placeholder="DD/MM/YYYY" type="text" class="form-control" />
+<input onpaste="return false" maxlength="30" name="vesselNm" style="width:230px;" id="vesselNm" type="text" class="form-control uppercase" onkeypress="return isNumberCharacterKeyAccom(event);" />
+<select name="trvlMode" style="width:230px" id="trvlMode" class="form-control uppercase trvlMode">
+<select name="embark" style="width:230px" id="embark" class="form-control uppercase embark">
+<select name="accommodationStay" style="width:80%" id="accommodationStay" class="form-control uppercase">
+<input onblur="validateAddress(this.id)" onpaste="return false" maxlength="100" name="accommodationAddress1" style="width:80%" id="accommodationAddress1" type="text" class="form-control uppercase" onkeypress="return isNumberCharacterKeyAccom(event);" />
+<input onblur="validateAddress(this.id)" onpaste="return false" maxlength="100" name="accommodationAddress2" style="width:80%" id="accommodationAddress2" type="text" class="form-control uppercase" onkeypress="return isNumberCharacterKeyAccom(event);" />
+<select name="accommodationState" onchange="retrieveRefCity(this.value);" style="width:230px" id="accommodationState" class="form-control uppercase">
+<input maxlength="5" name="accommodationPostcode" style="width:130px" id="accommodationPostcode" type="text" class="form-control uppercase accommodationPostcode" onkeypress="return isNumberSpecialKey(event);" />
+<select name="accommodationCity" onchange="retrievePostcode(this.value);" style="width:230px" id="accommodationCity" class="form-control uppercase accommodationCity">
+<input name="sliderCapture" id="sliderCapture" type="hidden" value="" />
+<input name="submitRegistration" id="submit" type="submit" class="btn btn-primary toggle-loading" value="Submit" />
+<input onclick="resetSearch();" name="showForm" id="reset" type="submit" class="btn btn-info toggle-loading" value="reset" />
+<input type="hidden" name="_sourcePage" value="SCRUBBED" />
+<input type="hidden" name="__fp" value="SCRUBBED" />
+<form data-toggle="validator" role="form">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<input type="button" class="btn btn-warning" data-dismiss="modal" value="Tidak" id="cancelBtn" style="width:100px;"/>
+
+# Small select option values
+sex: =Please Choose, 1=MALE, 2=FEMALE
+trvlMode: =Please Choose, 1=AIR, 2=LAND, 3=SEA
+accommodationStay: =Please Choose, 01=HOTEL/MOTEL/REST HOUSE, 02=RESIDENCE OF FRIENDS/RELATIVES, 99=OTHERS
+accommodationState: =Please Choose, 01=JOHOR, 02=KEDAH, 03=KELANTAN, 04=MELAKA, 05=NEGERI SEMBILAN, 06=PAHANG, 07=PULAU PINANG, 08=PERAK, 09=PERLIS, 10=SELANGOR, 11=TERENGGANU, 12=SABAH, 13=SARAWAK, 14=WP KUALA LUMPUR, 15=WP LABUAN, 16=WP PUTRAJAYA
+
+# Large selects: option counts (live DOM)
+nationality: 274 options; sample: , AFG, ALB ...
+pob: 274 options; sample: , AFG, ALB ...
+region: 244 options; sample: , 1, 1 ...
+embark: 275 options; sample: , AFG, ALB ...
