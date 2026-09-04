@@ -341,6 +341,14 @@ green again on the quiet-wait build; a full fill takes about 1.6 s on the live f
 page's request counter reads zero before and after the fill. Committed as the first
 commit of the repo.
 
+v0.2.0 presets (A8), same harness: saving a transport without a name is refused with the
+message; a saved transport appears in the dropdown, is selected, shows Remove, and
+restores mode, number and embarkation after the fields were changed; a saved address
+(Selangor, Shah Alam) applied from a Kuala Lumpur setting reloads the city list and lands
+on 1038 with its postcode; a fill with both presets chosen reads back green with LAND,
+the plate number and city 1038; Remove deletes the preset from the dropdown and the
+store; the typed arrival date survives every save re-render.
+
 ## 13. Calls Chris can override
 
 - Default embarkation `SGP`, mode `1` AIR, state `14` WP Kuala Lumpur, city `1401`.
@@ -419,3 +427,20 @@ commit of the repo.
   - Section 5: every store write goes through one read-fresh-then-write helper.
   - Section 6 step 1 is the real drift check; its failures route to the `drift` state.
   - The panel's city list is fetched once per state for the page's life.
+- A8, feature request from Chris after the first install (2026-09-04), v0.2.0:
+  - Section 5: the store gains `transports` and `addresses`, each a map of preset name to
+    values. A transport preset is `travelMode`, `transportNo`, `embarkation` (for example
+    Leah's father's car: LAND, the plate number, Singapore). An address preset is the whole
+    accommodation block: `stayType`, `address1`, `address2`, `stateCode`, `cityCode`,
+    `postcode` (for example How Sen's business address). `lastTrip` keeps working as before.
+  - Section 7, `ready` state: two dropdowns, `Saved transport` above the transport fields
+    and `Saved address` above the accommodation fields, each defaulting to `Last used`.
+    Choosing a preset writes its values into the fields below it (the city list reloads for
+    the preset's state). Under each group: a name box (`Name it, e.g. Dad's car or How Sen
+    office`), a `Save transport` / `Save address` button that stores the current field
+    values under that name, and a `Remove` button shown only while a saved preset is
+    selected. Saving validates those fields with the same rules as a fill and refuses with
+    the usual problems list; a missing name is refused with `give it a name before saving`.
+    The typed trip survives every such re-render.
+  - Fill itself is unchanged: it reads the fields, so a chosen preset is just what the
+    fields hold.

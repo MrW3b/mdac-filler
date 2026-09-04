@@ -26,6 +26,10 @@ Profiles are stored in Tampermonkey's own storage on this Mac only.
 1. Open `https://imigresen-online.imi.gov.my/mdac/main?registerMain`.
 2. Pick the traveller, type the arrival date (today to today plus two days, Singapore
    time), check the trip fields, press Fill form.
+   Saved transport and Saved address dropdowns fill their fields for you (for example
+   Dad's car by land, or the How Sen office). To add one: set the fields, type a name
+   in the box under them, press Save transport or Save address. Remove deletes the
+   selected preset.
 3. Read the review table. Red rows mean do not submit: fix and fill again.
 4. Press "Looks right, go to puzzle". Solve the puzzle by hand.
 5. Press the site's SUBMIT.

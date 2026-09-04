@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MDAC Filler
 // @namespace    https://github.com/MrW3b/mdac-filler
-// @version      0.1.2
+// @version      0.2.0
 // @description  Fills the Malaysia Digital Arrival Card registration form from a saved traveller profile. Never touches the puzzle or Submit.
 // @author       Chris Weber
 // @match        https://imigresen-online.imi.gov.my/mdac/main*
@@ -126,6 +126,12 @@
     'address1', 'address2', 'stateCode', 'cityCode', 'postcode'];
   // Panel states that show the review rows (and keep the late-reload guard alive).
   const ROW_STATES = ['review', 'handoff', 'verified'];
+  // Saved presets (spec A8): a transport is mode + number + embarkation; an address is
+  // the whole accommodation block. Both live in the store next to the profiles.
+  const PRESETS = {
+    transports: { label: 'Saved transport', save: 'Save transport', keys: ['travelMode', 'transportNo', 'embarkation'] },
+    addresses: { label: 'Saved address', save: 'Save address', keys: ['stayType', 'address1', 'address2', 'stateCode', 'cityCode', 'postcode'] },
+  };
 
   // Frozen UI copy (spec 7). Change the spec first if any of this changes.
   const COPY = {
@@ -150,6 +156,12 @@
       newName: 'New traveller name', add: 'Add',
     },
     problems: 'Fix these before filling:',
+    presets: {
+      lastUsed: 'Last used',
+      namePlaceholder: "Name it, e.g. Dad's car or How Sen office",
+      remove: 'Remove',
+      nameNeeded: 'give it a name before saving',
+    },
     arrivalWindow: (from, to) => `Arrival must be between ${from} and ${to}, the form's own window. If that looks stale, reload the page.`,
     stopped: (label, kind) => `Filling stopped at "${label}" (${kind}). Reload the page and fill again.`,
     hiddenField: 'the form hides this field',
@@ -204,6 +216,9 @@
       },
       // Email domain seen at each traveller's last fill, for the yellow warning.
       emailDomains: {},
+      // Saved presets by name (spec A8).
+      transports: {},
+      addresses: {},
     };
   }
 
@@ -214,7 +229,7 @@
       try { data = JSON.parse(raw); } catch { data = null; }
     }
     if (!data || data.version !== 1 || !data.profiles) data = defaultStore();
-    if (!data.emailDomains) data.emailDomains = {};
+    for (const k of ['emailDomains', 'transports', 'addresses']) if (!data[k]) data[k] = {};
     return data;
   }
 
@@ -342,7 +357,13 @@
   }
 
   function validateTrip(t) {
-    const { problems, need } = problemCollector();
+    return validateTripFields(t, Object.keys(t));
+  }
+
+  // The trip rules, applied to the listed keys only (a preset is a subset of a trip).
+  function validateTripFields(t, keys) {
+    const { problems, need: needAll } = problemCollector();
+    const need = (key, ok, why) => { if (keys.includes(key)) needAll(key, ok, why); };
     const win = arrivalWindow();
     const arrivalOk = validIso(t.arrivalDate) && t.arrivalDate >= win.from && t.arrivalDate <= win.to;
     need('arrivalDate', arrivalOk, COPY.arrivalWindow(isoToDmy(win.from), isoToDmy(win.to)));
@@ -652,6 +673,10 @@
     #mdacf-panel .mdacf-muted { color: #666; font-size: 12px; margin: 6px 0; }
     #mdacf-panel .mdacf-red-line { color: #a00; font-weight: 600; margin-top: 8px; }
     #mdacf-panel details { margin-top: 8px; }
+    #mdacf-panel .mdacf-row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+    #mdacf-panel .mdacf-row input { flex: 1; min-width: 0; }
+    #mdacf-panel .mdacf-row button { margin: 0; white-space: nowrap; }
+    #mdacf-panel .mdacf-row button[hidden] { display: none; }
   `;
 
   // Appends children, flattening arrays and skipping empties. WHY: Element.append()
@@ -748,7 +773,8 @@
     const store = loadStore();
     const names = Object.keys(store.profiles);
     const win = arrivalWindow();
-    // A draft exists only when a fill was refused with problems: keep what was typed.
+    // A draft exists when the view re-renders mid-edit (a refused fill, a preset saved
+    // or removed): keep what was typed.
     const draft = ctx.draft || {};
     const trip = { ...store.lastTrip, ...draft };
     const preferred = draft.profileName || store.lastProfile;
@@ -802,20 +828,73 @@
       },
     });
 
+    // Presets (spec A8). Choosing one writes its values into the fields below it;
+    // Fill still reads the fields, so a preset is simply what the fields hold.
+    const presetSelects = {};
+    const currentDraft = () => ({
+      ...collect().trip,
+      profileName: traveller.value,
+      transportsPreset: presetSelects.transports ? presetSelects.transports.value : '',
+      addressesPreset: presetSelects.addresses ? presetSelects.addresses.value : '',
+    });
+    const applyTransport = (p) => { mode.value = p.travelMode; transport.value = p.transportNo; embark.value = p.embarkation; };
+    const applyAddress = (p) => {
+      stay.value = p.stayType; address1.value = p.address1; address2.value = p.address2;
+      state.value = p.stateCode; postcode.value = p.postcode;
+      loadCities(p.stateCode, p.cityCode);
+    };
+
+    function presetBlock(kind, apply) {
+      const spec = PRESETS[kind];
+      const saved = store[kind];
+      const chosen = draft[kind + 'Preset'] || '';
+      const sel = optionsSelect([['', COPY.presets.lastUsed], ...Object.keys(saved).map((n) => [n, n])],
+        chosen in saved ? chosen : '', { id: `mdacf-${kind}-preset` });
+      const nameInput = h('input', { type: 'text', placeholder: COPY.presets.namePlaceholder, maxlength: 40 });
+      const removeBtn = h('button', { class: 'mdacf-danger', text: COPY.presets.remove, onclick: () => {
+        updateStore((s) => { delete s[kind][sel.value]; });
+        render('ready', { draft: { ...currentDraft(), [kind + 'Preset']: '' } });
+      } });
+      const saveBtn = h('button', { class: 'mdacf-secondary', text: spec.save, onclick: () => {
+        const name = nameInput.value.trim();
+        const t = collect().trip;
+        const problems = name ? validateTripFields(t, spec.keys) : [`${spec.label}: ${COPY.presets.nameNeeded}`];
+        if (problems.length) { render('ready', { problems: problems.map((p) => `Trip, ${p}`), draft: currentDraft() }); return; }
+        updateStore((s) => { s[kind][name] = Object.fromEntries(spec.keys.map((k) => [k, t[k]])); });
+        render('ready', { draft: { ...currentDraft(), [kind + 'Preset']: name } });
+      } });
+      removeBtn.hidden = !sel.value;
+      sel.addEventListener('change', () => {
+        removeBtn.hidden = !sel.value;
+        if (saved[sel.value]) apply(saved[sel.value]);
+      });
+      presetSelects[kind] = sel;
+      return {
+        pick: [h('label', { text: spec.label }), sel],
+        save: h('div', { class: 'mdacf-row' }, nameInput, saveBtn, removeBtn),
+      };
+    }
+    const transports = presetBlock('transports', applyTransport);
+    const addresses = presetBlock('addresses', applyAddress);
+
     mount(
       problemsList(ctx.problems),
       h('label', { text: COPY.ready.traveller }), traveller,
       h('label', { text: LABELS.arrivalDate }), arrival,
       h('label', { text: LABELS.departureDate }), departure,
-      h('label', { text: LABELS.transportNo }), transport,
+      transports.pick,
       h('label', { text: LABELS.travelMode }), mode,
+      h('label', { text: LABELS.transportNo }), transport,
       h('label', { text: LABELS.embarkation }), embark,
+      transports.save,
+      addresses.pick,
       h('label', { text: LABELS.stayType }), stay,
       h('label', { text: LABELS.address1 }), address1,
       h('label', { text: LABELS.address2 }), address2,
       h('label', { text: LABELS.stateCode }), state,
       h('label', { text: LABELS.cityCode }), city,
       h('label', { text: LABELS.postcode }), postcode,
+      addresses.save,
       h('div', {},
         h('button', { text: COPY.ready.fill, onclick: () => onFill(collect()) }),
         h('button', { class: 'mdacf-secondary', text: COPY.ready.edit, onclick: () => render('edit', {}) })),
