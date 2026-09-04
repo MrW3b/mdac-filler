@@ -333,6 +333,11 @@ mirror input following and the row turned yellow with the note; the same for the
 while in `handoff`; switching traveller inside Edit without saving no longer leaks into the
 next Edit.
 
+Re-run on v0.1.2 (after the `/simplify` amendments in Section 15, A7): every test above
+green again on the quiet-wait build; a full fill takes about 1.6 s on the live form; the
+page's request counter reads zero before and after the fill. Committed as the first
+commit of the repo.
+
 ## 13. Calls Chris can override
 
 - Default embarkation `SGP`, mode `1` AIR, state `14` WP Kuala Lumpur, city `1401`.
