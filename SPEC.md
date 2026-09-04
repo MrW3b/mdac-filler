@@ -288,8 +288,11 @@ mdac-filler/
 Lean call: no release-please, no dependabot, no test framework. The test plan is a live
 dry-run protocol (Section 12), because the only thing that can break is the form itself.
 
-Tampermonkey status on this Mac (checked 2026-09-04): not installed in any of the four
-Chrome profiles. Install is step 0 of the README.
+Tampermonkey status on this Mac (corrected 2026-09-04): installed in the Chrome profile
+`buildwithapex.com` (Profile 2) only. An earlier check that read only the Default profile
+reported it missing; that was wrong. The MDAC page must be opened in that profile, or
+Tampermonkey installed in the profile used. The repo is public so the header's
+`@updateURL` delivers updates.
 
 ## 12. Test plan (live form, never submitted)
 
