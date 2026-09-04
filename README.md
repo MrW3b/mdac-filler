@@ -10,10 +10,11 @@ Spec: [SPEC.md](SPEC.md). Build status: v0.1.2, all spec tests green on the live
 ## Install (once)
 
 1. Install Tampermonkey for Chrome from the Chrome Web Store.
-2. Open the raw script URL. Tampermonkey opens its install dialog. Press Install.
-   `https://raw.githubusercontent.com/MrW3b/mdac-filler/main/mdac-filler.user.js`
-   Until the repo is on GitHub, drag `mdac-filler.user.js` from this folder onto the
-   Tampermonkey dashboard instead.
+2. Drag `mdac-filler.user.js` from this folder onto the Tampermonkey dashboard and press
+   Install. The repo is private, so the raw GitHub URL in the script header returns 404
+   without a login and Tampermonkey cannot auto-update from it. To update: `git pull`,
+   then drag the file onto the dashboard again. (Making the repo public would enable
+   the auto-update URL; the repo holds no personal data, gitleaks checks every commit.)
 3. Open the MDAC registration page. A panel appears bottom-right.
 4. Press Edit profiles, fill in Chris and Leah, press Save for each.
 
