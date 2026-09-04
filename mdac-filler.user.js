@@ -37,6 +37,8 @@
     9. Boot
 */
 
+/* global unsafeWindow, GM_getValue, GM_setValue */
+
 (function () {
   'use strict';
 

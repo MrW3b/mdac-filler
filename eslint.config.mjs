@@ -8,12 +8,9 @@ export default [
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'script',
-      globals: {
-        ...globals.browser,
-        GM_getValue: 'readonly',
-        GM_setValue: 'readonly',
-        unsafeWindow: 'readonly',
-      },
+      // Tampermonkey globals are declared by the /* global */ directive in the script
+      // itself, so any eslint config (including super-linter's default) accepts them.
+      globals: { ...globals.browser },
     },
     rules: {
       'no-unused-vars': ['error', { args: 'none' }],
